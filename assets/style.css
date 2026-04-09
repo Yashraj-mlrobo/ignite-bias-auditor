@@ -1,0 +1,423 @@
+/* ═══════════════════════════════════════════════════════════════
+   IGNITE BIAS AUDITOR — style.css
+   Theme: Deep Navy + Gold · Editorial
+   Fonts: Playfair Display (headings) + DM Sans (body)
+═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── CSS Variables ────────────────────────────────────────────── */
+:root {
+    --navy-900: #0a0e1a;
+    --navy-800: #0f1628;
+    --navy-700: #151d36;
+    --navy-600: #1c2844;
+    --navy-500: #243058;
+    --gold-400: #f0c040;
+    --gold-300: #f5d070;
+    --gold-200: #fae4a0;
+    --gold-accent: #c9960c;
+    --white: #ffffff;
+    --off-white: #f0ede8;
+    --muted: #8892a4;
+    --muted-light: #b0bac8;
+    --success: #2dd4a0;
+    --danger: #f06060;
+    --border: rgba(240, 192, 64, 0.15);
+    --card-bg: rgba(21, 29, 54, 0.85);
+}
+
+/* ── Global Reset ─────────────────────────────────────────────── */
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif !important;
+    background-color: var(--navy-900) !important;
+    color: var(--off-white) !important;
+}
+
+/* ── Hide Streamlit Default Chrome ───────────────────────────── */
+#MainMenu, footer, header {
+    visibility: hidden;
+}
+
+.block-container {
+    padding: 2.5rem 3rem 4rem 3rem !important;
+    max-width: 1200px !important;
+}
+
+/* ── Page Background ──────────────────────────────────────────── */
+.stApp {
+    background-color: var(--navy-900) !important;
+    background-image:
+        radial-gradient(ellipse at 10% 0%, rgba(240, 192, 64, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 100%, rgba(36, 48, 88, 0.8) 0%, transparent 60%);
+}
+
+/* ── Page Title (st.title) ────────────────────────────────────── */
+h1 {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 2.8rem !important;
+    font-weight: 700 !important;
+    color: var(--white) !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.15 !important;
+    margin-bottom: 0.2rem !important;
+}
+
+h1::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 3px;
+    background: var(--gold-400);
+    margin-top: 0.6rem;
+    border-radius: 2px;
+}
+
+/* ── Headings ─────────────────────────────────────────────────── */
+h2, h3 {
+    font-family: 'Playfair Display', serif !important;
+    color: var(--off-white) !important;
+}
+
+h2 { font-size: 1.6rem !important; font-weight: 600 !important; }
+h3 { font-size: 1.2rem !important; font-weight: 600 !important; }
+
+/* ── Upload Header ────────────────────────────────────────────── */
+.upload-header {
+    margin: 2rem 0 1.2rem 0;
+}
+
+.upload-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    color: var(--gold-400);
+    text-transform: uppercase;
+}
+
+.upload-sub {
+    font-size: 1rem;
+    color: var(--muted-light);
+    margin-top: 0.35rem;
+    font-weight: 300;
+}
+
+/* ── File Uploader ────────────────────────────────────────────── */
+[data-testid="stFileUploader"] {
+    background: var(--navy-700) !important;
+    border: 1.5px dashed var(--border) !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    transition: border-color 0.2s ease;
+}
+
+[data-testid="stFileUploader"]:hover {
+    border-color: rgba(240, 192, 64, 0.4) !important;
+}
+
+[data-testid="stFileUploader"] label {
+    color: var(--muted-light) !important;
+    font-size: 0.9rem !important;
+}
+
+[data-testid="stFileUploaderDropzoneInstructions"] {
+    color: var(--muted) !important;
+}
+
+/* ── File Info Bar ────────────────────────────────────────────── */
+.file-info-bar {
+    display: flex;
+    gap: 0;
+    background: var(--navy-700);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1.2rem 0;
+}
+
+.file-info-item {
+    flex: 1;
+    padding: 0.9rem 1.2rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.file-info-item:last-child {
+    border-right: none;
+}
+
+.info-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.info-value {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--off-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dataset-tag {
+    color: var(--gold-400) !important;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+}
+
+/* ── Dataframe / Table ────────────────────────────────────────── */
+[data-testid="stDataFrame"] {
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border) !important;
+}
+
+[data-testid="stDataFrame"] table {
+    background: var(--navy-800) !important;
+}
+
+[data-testid="stDataFrame"] th {
+    background: var(--navy-600) !important;
+    color: var(--gold-300) !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+[data-testid="stDataFrame"] td {
+    color: var(--muted-light) !important;
+    font-size: 0.85rem !important;
+    border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+}
+
+/* ── Expander ─────────────────────────────────────────────────── */
+[data-testid="stExpander"] {
+    background: var(--navy-700) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+
+[data-testid="stExpander"] summary {
+    color: var(--off-white) !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+}
+
+/* ── Primary Button (RUN BIAS AUDIT) ──────────────────────────── */
+[data-testid="stButton"] > button[kind="primary"] {
+    background: linear-gradient(135deg, var(--gold-accent), var(--gold-400)) !important;
+    color: var(--navy-900) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    padding: 0.75rem 2rem !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 20px rgba(240, 192, 64, 0.25) !important;
+}
+
+[data-testid="stButton"] > button[kind="primary"]:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 28px rgba(240, 192, 64, 0.4) !important;
+}
+
+[data-testid="stButton"] > button[kind="primary"]:active {
+    transform: translateY(0) !important;
+}
+
+/* ── Success / Warning / Error Messages ───────────────────────── */
+[data-testid="stAlert"] {
+    border-radius: 8px !important;
+    border: none !important;
+    font-size: 0.88rem !important;
+}
+
+.stSuccess {
+    background: rgba(45, 212, 160, 0.1) !important;
+    color: var(--success) !important;
+    border-left: 3px solid var(--success) !important;
+}
+
+.stWarning {
+    background: rgba(240, 192, 64, 0.08) !important;
+    color: var(--gold-300) !important;
+    border-left: 3px solid var(--gold-400) !important;
+}
+
+.stError {
+    background: rgba(240, 96, 96, 0.1) !important;
+    color: var(--danger) !important;
+    border-left: 3px solid var(--danger) !important;
+}
+
+/* ── Audit Summary Title ──────────────────────────────────────── */
+.audit-summary-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-400);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+}
+
+/* ── Metric Cards ─────────────────────────────────────────────── */
+.metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(240, 192, 64, 0.35);
+}
+
+.metric-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+}
+
+.metric-note {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+/* ── Before / After Accuracy Cards ───────────────────────────── */
+.accent-before {
+    border-left: 3px solid var(--danger) !important;
+}
+
+.accent-before .metric-value {
+    color: var(--danger) !important;
+}
+
+.accent-after {
+    border-left: 3px solid var(--success) !important;
+}
+
+.accent-after .metric-value {
+    color: var(--success) !important;
+}
+
+/* ── Drop Hint ────────────────────────────────────────────────── */
+.drop-hint {
+    text-align: center;
+    padding: 3rem 0 2rem 0;
+    opacity: 0.5;
+}
+
+.drop-icon {
+    font-size: 2rem;
+    color: var(--gold-400);
+    margin-bottom: 0.8rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+.drop-text {
+    font-size: 1rem;
+    color: var(--muted-light);
+    font-weight: 400;
+}
+
+.drop-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+/* ── Spinner ──────────────────────────────────────────────────── */
+[data-testid="stSpinner"] {
+    color: var(--gold-400) !important;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--navy-800);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--navy-500);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-accent);
+}
+
+/* ── Divider ──────────────────────────────────────────────────── */
+hr {
+    border-color: var(--border) !important;
+    margin: 2rem 0 !important;
+}
+
+/* ── Sidebar (if used later) ──────────────────────────────────── */
+[data-testid="stSidebar"] {
+    background: var(--navy-800) !important;
+    border-right: 1px solid var(--border) !important;
+}
+
+/* ── Metrics (st.metric) ──────────────────────────────────────── */
+[data-testid="stMetric"] {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    padding: 1rem 1.2rem !important;
+}
+
+[data-testid="stMetricLabel"] {
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 0.12em !important;
+    color: var(--muted) !important;
+    text-transform: uppercase !important;
+}
+
+[data-testid="stMetricValue"] {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.8rem !important;
+    color: var(--white) !important;
+}

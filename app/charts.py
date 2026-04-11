@@ -1,6 +1,9 @@
 import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # ── Theme Constants ───────────────────────────────────────────────────────────
 NAVY_900  = "#0a0e1a"
@@ -52,10 +55,10 @@ def render_bias_bar_chart(audit_result: dict):
     Color-coded by severity.
     """
     metrics = {
-        "Disparate Impact":         audit_result.get("disparate_impact", 0),
-        "Stat. Parity Diff.":       audit_result.get("statistical_parity_difference", 0),
-        "Equal Opportunity Diff.":  audit_result.get("equal_opportunity_difference", 0),
-        "Demographic Parity Diff.": audit_result.get("demographic_parity_difference", 0),
+    "Disparate Impact":         audit_result.get("disparate_impact", 0),
+    "Stat. Parity Diff.":       abs(audit_result.get("statistical_parity_difference", 0)),
+    "Equal Opportunity Diff.":  abs(audit_result.get("equal_opportunity_difference", 0)),
+    "Demographic Parity Diff.": abs(audit_result.get("demographic_parity_difference", 0)),
     }
 
     labels = list(metrics.keys())
@@ -111,7 +114,7 @@ def render_bias_bar_chart(audit_result: dict):
             gridcolor="rgba(0,0,0,0)",
             tickfont=dict(size=11, color=OFF_WHITE),
         ),
-        height=280,
+        height=350,
         bargap=0.35,
     )
 
@@ -171,7 +174,7 @@ def render_disparate_impact_gauge(audit_result: dict):
 
     fig.update_layout(
         **PLOTLY_LAYOUT,
-        height=260,
+        height=320,
     )
 
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
@@ -276,7 +279,7 @@ def render_before_after_chart(audit_result: dict):
 def render_charts_section(audit_result: dict):
     """
     Call this from main.py after audit completes.
-    Renders all 3 charts in a clean layout.
+    Renders all charts in a clean spacious layout.
     """
     st.markdown("<div style='height: 1.5rem'></div>", unsafe_allow_html=True)
 
@@ -284,7 +287,7 @@ def render_charts_section(audit_result: dict):
         """
         <div style="font-family:'DM Mono',monospace; font-size:0.68rem;
                     letter-spacing:0.2em; color:#f0c040; text-transform:uppercase;
-                    margin-bottom:1rem; padding-bottom:0.6rem;
+                    margin-bottom:1.5rem; padding-bottom:0.6rem;
                     border-bottom:1px solid rgba(240,192,64,0.15);">
             Visual Analysis
         </div>
@@ -292,14 +295,36 @@ def render_charts_section(audit_result: dict):
         unsafe_allow_html=True
     )
 
-    # Row 1: Gauge + Bar chart side by side
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        render_disparate_impact_gauge(audit_result)
+    # Row 1 — Gauge full width centered
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        render_bias_bar_chart(audit_result)
+        render_disparate_impact_gauge(audit_result)
 
-    st.markdown("<div style='height: 0.5rem'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
-    # Row 2: Before vs After full width
+    # Row 2 — Bias metrics bar chart full width
+    render_bias_bar_chart(audit_result)
+
+    st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
+
+    # Row 3 — Before vs After full width
     render_before_after_chart(audit_result)
+
+if __name__ == "__main__":
+    import streamlit as st
+    st.set_page_config(page_title="Charts Test", layout="wide")
+    
+    dummy_result = {
+        "dataset": "adult",
+        "protected_attribute": "sex",
+        "disparate_impact": 0.3635,
+        "statistical_parity_difference": -0.1989,
+        "equal_opportunity_difference": 0.0221,
+        "demographic_parity_difference": 0.0481,
+        "before_accuracy": 0.7914,
+        "after_accuracy": 0.7886,
+        "before_demographic_parity": 0.0481,
+        "after_demographic_parity": 0.0002
+    }
+    
+    render_charts_section(dummy_result)

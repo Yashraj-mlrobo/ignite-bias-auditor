@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
-from audit import run_full_audit
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from app.audit import run_full_audit
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 MAX_FILE_SIZE_MB = 50
@@ -48,11 +51,10 @@ def validate_dataframe(df: pd.DataFrame) -> list[str]:
 
 # ── Backend Bridge ────────────────────────────────────────────────────────────
 def run_audit_for_dataset(df: pd.DataFrame, dataset_type: str) -> dict:
-    """
-    Calls Yash's audit.py run_full_audit() with detected dataset type.
-    Returns the full result dictionary.
-    """
     try:
+        # Save uploaded file temporarily so audit.py can process it
+        temp_path = f"data/uploaded_{dataset_type}.csv"
+        df.to_csv(temp_path, index=False)
         result = run_full_audit(dataset=dataset_type)
         result["status"] = "ok"
         return result
@@ -65,6 +67,35 @@ def run_audit_for_dataset(df: pd.DataFrame, dataset_type: str) -> dict:
 
 # ── Upload UI ─────────────────────────────────────────────────────────────────
 def render_upload_section():
+
+    st.markdown("""
+                  <style>
+                  .upload-header { margin-bottom: 1rem; }
+                  .upload-label { font-size: 11px; font-weight: 600; letter-spacing: 2px; opacity: 0.5; }
+                  .upload-sub { font-size: 14px; margin-top: 4px; opacity: 0.7; }
+                  .file-info-bar { display: flex; gap: 24px; padding: 12px 16px; 
+                                   background: rgba(128,128,128,0.1); border-radius: 8px; 
+                                   margin: 12px 0; flex-wrap: wrap; }
+                  .file-info-item { display: flex; flex-direction: column; gap: 2px; }
+                  .info-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; opacity: 0.5; }
+                  .info-value { font-size: 14px; font-weight: 500; }
+                  .dataset-tag { color: #1D9E75; font-weight: 700; }
+                  .metric-card { background: rgba(128,128,128,0.1); border-radius: 10px; 
+                                   padding: 16px; text-align: center; }
+                  .metric-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; 
+                                   opacity: 0.6; margin-bottom: 8px; }
+                  .metric-value { font-size: 24px; font-weight: 700; }
+                  .metric-note { font-size: 11px; opacity: 0.5; margin-top: 4px; }
+                  .accent-before .metric-value { color: #E24B4A; }
+                  .accent-after .metric-value { color: #1D9E75; }
+                  .drop-hint { text-align: center; padding: 48px; opacity: 0.4; }
+                  .drop-icon { font-size: 32px; margin-bottom: 12px; }
+                  .drop-text { font-size: 16px; font-weight: 500; }
+                  .drop-sub { font-size: 13px; margin-top: 4px; }
+                  .audit-summary-title { font-size: 11px; font-weight: 600; 
+                                    letter-spacing: 2px; opacity: 0.5; margin-bottom: 12px; }
+    </style>
+        """, unsafe_allow_html=True)
     """
     Main upload UI component. Call this from main.py.
 

@@ -32,10 +32,11 @@ env/
 Thumbs.db
 
 # Models & large files
-models/*.pkl
-models/*.h5
-models/*.joblib
-data/*.csv
+models/
+*.pkl
+*.h5
+*.joblib
+data/
 
 # Streamlit
 .streamlit/secrets.toml

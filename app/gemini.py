@@ -1,37 +1,117 @@
-import google.generativeai as genai
-import pandas as pd
 import os
+import time
+from google import genai
+from dotenv import load_dotenv
 
-# Set up your API Key
-# Recommendation: Use an environment variable for security
-genai.configure(api_key="YOUR_FREE_AI_STUDIO_KEY")
+load_dotenv()
 
-def analyze_data_with_gemini(df: pd.DataFrame):
+
+def get_ai_summary(audit_results):
     """
-    Sends data summary to Gemini and gets a bias audit response.
+    Takes audit results and generates plain English bias report using Gemini.
     """
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    
-    # We send a summary (head, types, stats) rather than the whole file 
-    # to stay within token limits and maintain privacy.
-    data_summary = f"""
-    Analyze this dataset for potential bias:
-    Columns: {df.columns.tolist()}
-    Data Types: {df.dtypes.to_string()}
-    Sample Data:
-    {df.head(5).to_string()}
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return "Error: GEMINI_API_KEY not found in environment variables."
+
+    client = genai.Client(api_key=api_key)
+
+    prompt = f"""
+    You are an AI Ethics Auditor for Team IGNITE, competing in Google Solution Challenge 2026.
+    Analyze the following machine learning bias audit results.
+
+    DATASET CONTEXT:
+    - Dataset: {audit_results.get('dataset', 'Unknown').upper()}
+    - Protected Attribute: {audit_results.get('protected_attribute', 'Unknown')}
+
+    BEFORE MITIGATION:
+    - Accuracy: {audit_results.get('before_accuracy', 'N/A')}
+    - Demographic Parity Difference: {audit_results.get('before_demographic_parity', 'N/A')}
+    - Disparate Impact: {audit_results.get('disparate_impact', 'N/A')}
+    - Equal Opportunity Difference: {audit_results.get('equal_opportunity_difference', 'N/A')}
+
+    AFTER MITIGATION (Fairlearn ThresholdOptimizer):
+    - Accuracy: {audit_results.get('after_accuracy', 'N/A')}
+    - Demographic Parity Difference: {audit_results.get('after_demographic_parity', 'N/A')}
+
+    INSTRUCTIONS:
+    1. Assess the initial model — was it biased? Explain Disparate Impact and Demographic Parity simply.
+    2. Evaluate the mitigation — did ThresholdOptimizer successfully reduce bias?
+    3. Discuss the trade-off — was the accuracy drop worth the fairness gain?
+    4. Keep tone professional and easy to understand for a non-technical judge.
+    5. Format with Markdown — use bolding and bullet points.
     """
-    
-    try:
-        response = model.generate_content(data_summary)
-        return {
-            "status": "ok",
-            "message": "Analysis complete.",
-            "result": response.text
-        }
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e),
-            "result": None
-        }
+
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3-flash-preview",
+                contents=prompt
+            )
+            return response.text
+        except Exception as e:
+            if "503" in str(e) and attempt < 2:
+                print(f"Model busy, retrying in 10s... (attempt {attempt+1}/3)")
+                time.sleep(10)
+            else:
+                return f"An error occurred while generating the AI report: {e}"
+
+
+def get_shap_summary(feature_impacts, protected_attribute, dataset):
+    """
+    Takes top SHAP features and explains in plain English
+    why the model is discriminating against the unprivileged group.
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return "Error: GEMINI_API_KEY not found."
+
+    client = genai.Client(api_key=api_key)
+
+    prompt = f"""
+    You are an AI Ethics Auditor for Team IGNITE, Google Solution Challenge 2026.
+
+    A SHAP analysis was run on a machine learning model trained on the {dataset} dataset.
+    The protected attribute being analyzed is: {protected_attribute}
+
+    The top features driving bias against the unprivileged group are:
+    {feature_impacts}
+
+    INSTRUCTIONS:
+    1. Explain in plain English why each feature may be causing discrimination
+    2. Suggest which features the organization should investigate or remove
+    3. Keep it under 150 words
+    4. Use simple language a non-technical judge can understand
+    5. Format with bullet points
+    """
+
+    for attempt in range(3):
+     try:
+        response = client.models.generate_content(
+            model="gemini-3-flash-preview",
+            contents=prompt
+        )
+        return response.text
+     except Exception as e:
+        if ("503" in str(e) or "429" in str(e)) and attempt < 2:
+            wait_time = 60 if "429" in str(e) else 10
+            print(f"API busy, retrying in {wait_time}s... (attempt {attempt+1}/3)")
+            time.sleep(wait_time)
+        else:
+            return f"An error occurred while generating the AI report: {e}"
+
+
+if __name__ == "__main__":
+    dummy_data = {
+        "dataset": "adult",
+        "protected_attribute": "sex",
+        "disparate_impact": 0.3635,
+        "before_demographic_parity": 0.1989,
+        "before_accuracy": 0.7914,
+        "after_demographic_parity": 0.0002,
+        "after_accuracy": 0.7886,
+        "equal_opportunity_difference": 0.0221
+    }
+    print("Testing Gemini API...")
+    report = get_ai_summary(dummy_data)
+    print(report)
